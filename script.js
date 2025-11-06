@@ -18,3 +18,44 @@ function shuffle(items) {
     }
     return items
 }
+
+// Returns a HTML element of a card with given suit and rank.
+// suit should be a single character that is one of D,H,S,C
+// rank should be a number 0-12, where 0 is ace up to 12 is king
+function generateCardElement(suit, rank) {
+    let card = document.createElement("div")
+    card.className = "card w-32 h-48 border border-black";
+
+    const ranks = ['A','2','3','4','5','6','7','8','9','10','J','Q','K']
+    const rankString = ranks[rank]
+    let suit_unicode;
+    switch (suit) {
+        case 'D':
+            suit_unicode = "&diams;"
+            card.classList.add('text-red-500')
+            break;
+        case 'H':
+            suit_unicode = "&hearts;"
+            card.classList.add('text-red-500')
+            break;
+        case 'C':
+            suit_unicode = "&clubs;"
+            break;
+        case 'S':
+            suit_unicode = "&spades;"
+            break;
+        default:
+            suit_unicode = "X";
+            break;
+    }
+
+    card.innerHTML = `<div class="h-20 w-full text-2xl">${rankString}${suit_unicode}</div><div class="w-full text-center text-5xl">${suit_unicode}</div>`
+    return card
+}
+
+
+
+window.onload = () => {
+    const myCard = generateCardElement('D', '11')
+    document.getElementById('c').appendChild(myCard)
+};
