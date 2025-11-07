@@ -1,5 +1,5 @@
 console.log("Hello world!")
-
+let stacks = []
 
 // Returns a random integer between the two bounds.
 // Input: two bounds. Output: a random integer.
@@ -20,21 +20,22 @@ function shuffle(items) {
 }
 
 // Returns the order of n standard decks of cards shuffled together.
-// Format: 52n-array of 2-arrays [suit, rank] where suit is a 1-character string in 'DSCH' and rank is int 0-12 where 0 is ace and 12 is king.
+// Format: 52n-array of 3-arrays [suit, rank, copy] where suit is a 1-character string in 'DSCH' and rank is int 0-12 where 0 is ace and 12 is king and copy = 0 or 1 (for uniqueness)
 function shuffleDecksOfCards(numDecks) {
     let output = []
     let suits = ['D','H','C','S']
     for (let copy = 0; copy < numDecks; copy++) {
         for (let rank = 0; rank < 13; rank++) {
-            suits.forEach((suit) => {output.push([suit, rank])})
+            suits.forEach((suit) => {output.push([suit, rank, copy])})
         }
     }
     return shuffle(output)
 }
-// Returns a HTML element of a card with given suit and rank.
+// Returns a HTML element of a card with given suit, rank, and copy.
 // suit should be a single character that is one of D,H,S,C
 // rank should be a number 0-12, where 0 is ace up to 12 is king
-function generateCardElement(suit, rank) {
+// copy should be 0 or 1
+function generateCardElement(suit, rank, copy) {
     let card = document.createElement("div");
     card.className = "card w-[8vw] h-48 border border-black bg-amber-100";
 
@@ -62,6 +63,7 @@ function generateCardElement(suit, rank) {
     }
 
     card.innerHTML = `<div class="h-20 w-full text-2xl">${rankString}${suit_unicode}</div><div class="w-full text-center text-5xl">${suit_unicode}</div>`
+    card.id = `card-${copy}${suit}${rank}`
     return card
 }
 
@@ -80,6 +82,30 @@ function generateCardStack(cards) {
     return stack
 }
 
+function splitStack(event) {
+    if (event.target.id.substring(0,4) == 'card') {
+        cardClicked = event.target
+    } else if (event.target.parentElement.id.substring(0,4) == 'card') {
+        cardClicked = event.target.parentElement
+    } else {
+        console.log('No card clicked. Aborting')
+        return null
+    }
+    let cardArrayClicked = [cardClicked.id[6],parseInt(cardClicked.id.substring(7)),parseInt(cardClicked.id[5])]
+    let locationClicked = cardClicked.parentElement.parentElement // the location object
+    let stackClicked = stacks[locationClicked.id.substring(9)]
+    const indexClicked = stackClicked.findIndex(
+        (item) => item.every((value, index) => value === cardArrayClicked[index])
+    );
+    console.log(indexClicked)
+
+    let heldStack = document.createElement('div')
+    for (let i = indexClicked; i < stackClicked.length; i++) {
+        heldStack.appendChild(document.getElementById(`card-${stackClicked[i][2]}${stackClicked[i][0]}${stackClicked[i][1]}`))
+    }
+    return heldStack
+}
+
 window.onload = () => {
     //const myCard = generateCardElement('D', '11')
     const mainGameObject = document.getElementById('game')
@@ -94,8 +120,10 @@ window.onload = () => {
         const cardsToDeal = cards.slice(cardsDealt, cardsDealt+stackSizes[i])
         cardsDealt += stackSizes[i]
         stackLocation.appendChild(generateCardStack(cardsToDeal))
+        stacks.push(cardsToDeal)
         mainGameObject.appendChild(stackLocation)
     }
     //const cardlist = shuffle([['S','12'],['D','10'],['C','1'],['H','0']])
     //document.getElementById('game').appendChild(generateCardStack(cardlist))
+    document.addEventListener('mousedown', splitStack)
 };
