@@ -23,8 +23,8 @@ function shuffle(items) {
 // suit should be a single character that is one of D,H,S,C
 // rank should be a number 0-12, where 0 is ace up to 12 is king
 function generateCardElement(suit, rank) {
-    let card = document.createElement("div")
-    card.className = "card w-32 h-48 border border-black";
+    let card = document.createElement("div");
+    card.className = "card w-32 h-48 border border-black bg-amber-100";
 
     const ranks = ['A','2','3','4','5','6','7','8','9','10','J','Q','K']
     const rankString = ranks[rank]
@@ -53,9 +53,23 @@ function generateCardElement(suit, rank) {
     return card
 }
 
-
+// Returns a HTML element containing a stack of cards
+// cards is an array of 2-arrays [suit, rank]
+function generateCardStack(cards) {
+    let stack = document.createElement('div');
+    stack.className = 'stack w-32 h-full border border-red-200 border-3';
+    for (let i = 0; i < cards.length; i++) {
+        let card = generateCardElement(...cards[i]);
+        card.classList.add('absolute')
+        card.style.top = `${80*i}px`
+        card.style.zIndex = i
+        stack.appendChild(card)
+    }
+    return stack
+}
 
 window.onload = () => {
-    const myCard = generateCardElement('D', '11')
-    document.getElementById('c').appendChild(myCard)
+    //const myCard = generateCardElement('D', '11')
+    const cardlist = [['S','12'],['D','10'],['C','1'],['H','0']]
+    document.getElementById('c').appendChild(generateCardStack(cardlist))
 };
