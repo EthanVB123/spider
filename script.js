@@ -19,12 +19,24 @@ function shuffle(items) {
     return items
 }
 
+// Returns the order of n standard decks of cards shuffled together.
+// Format: 52n-array of 2-arrays [suit, rank] where suit is a 1-character string in 'DSCH' and rank is int 0-12 where 0 is ace and 12 is king.
+function shuffleDecksOfCards(numDecks) {
+    let output = []
+    let suits = ['D','H','C','S']
+    for (let copy = 0; copy < numDecks; copy++) {
+        for (let rank = 0; rank < 13; rank++) {
+            suits.forEach((suit) => {output.push([suit, rank])})
+        }
+    }
+    return shuffle(output)
+}
 // Returns a HTML element of a card with given suit and rank.
 // suit should be a single character that is one of D,H,S,C
 // rank should be a number 0-12, where 0 is ace up to 12 is king
 function generateCardElement(suit, rank) {
     let card = document.createElement("div");
-    card.className = "card w-32 h-48 border border-black bg-amber-100";
+    card.className = "card w-[8vw] h-48 border border-black bg-amber-100";
 
     const ranks = ['A','2','3','4','5','6','7','8','9','10','J','Q','K']
     const rankString = ranks[rank]
@@ -57,11 +69,11 @@ function generateCardElement(suit, rank) {
 // cards is an array of 2-arrays [suit, rank]
 function generateCardStack(cards) {
     let stack = document.createElement('div');
-    stack.className = 'stack w-32 h-full border border-red-200 border-3';
+    stack.className = 'stack w-full h-full';
     for (let i = 0; i < cards.length; i++) {
         let card = generateCardElement(...cards[i]);
         card.classList.add('absolute')
-        card.style.top = `${80*i}px`
+        card.style.top = `${5*i}vh`
         card.style.zIndex = i
         stack.appendChild(card)
     }
@@ -70,6 +82,20 @@ function generateCardStack(cards) {
 
 window.onload = () => {
     //const myCard = generateCardElement('D', '11')
-    const cardlist = [['S','12'],['D','10'],['C','1'],['H','0']]
-    document.getElementById('c').appendChild(generateCardStack(cardlist))
+    const mainGameObject = document.getElementById('game')
+    const stackSizes = [6,6,6,6,5,5,5,5,5,5] // starting arrangement of how many cards are in each column
+    const cards = shuffleDecksOfCards(2) // shuffle and distribute the cards
+    let cardsDealt = 0 //how many cards have already been dealt
+    // create the playing columns and fill them with cards
+    for (let i = 0; i < stackSizes.length; i++) {
+        stackLocation = document.createElement('div')
+        stackLocation.className = 'h-full w-[8vw] flex-none gap-[1vw] stack-location'
+        stackLocation.id = `location-${i}`
+        const cardsToDeal = cards.slice(cardsDealt, cardsDealt+stackSizes[i])
+        cardsDealt += stackSizes[i]
+        stackLocation.appendChild(generateCardStack(cardsToDeal))
+        mainGameObject.appendChild(stackLocation)
+    }
+    //const cardlist = shuffle([['S','12'],['D','10'],['C','1'],['H','0']])
+    //document.getElementById('game').appendChild(generateCardStack(cardlist))
 };
