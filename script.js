@@ -1,5 +1,6 @@
 console.log("Hello world!")
 let stacks = []
+let temp_stack = []
 const cardGap = 5; // vh; gap between cards in same stack
 // Returns a random integer between the two bounds.
 // Input: two bounds. Output: a random integer.
@@ -107,6 +108,7 @@ function splitStack(event) {
     for (let i = indexClicked; i < stackClicked.length; i++) {
         heldStack.appendChild(document.getElementById(`card-${stackClicked[i][2]}${stackClicked[i][0]}${stackClicked[i][1]}`))
     }
+    temp_stack = stackClicked.slice(indexClicked)
     stacks[locationClicked.id.substring(9)] = stackClicked.slice(0, indexClicked)
     orderStack(heldStack)
     return heldStack
@@ -150,6 +152,8 @@ function dropStack(event) {
         stackDroppedOnto.appendChild(card)
     }
     // TODO update stacks
+    stacks[stackLocationDropped].push(...temp_stack)
+    temp_stack = []
     orderStack(stackDroppedOnto)
     return stackDroppedOnto
 }
