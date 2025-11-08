@@ -1,6 +1,6 @@
 console.log("Hello world!")
 let stacks = []
-
+const cardGap = 5; // vh; gap between cards in same stack
 // Returns a random integer between the two bounds.
 // Input: two bounds. Output: a random integer.
 function randint(lowerInclusive, upperExclusive) {
@@ -75,7 +75,7 @@ function generateCardStack(cards) {
     for (let i = 0; i < cards.length; i++) {
         let card = generateCardElement(...cards[i]);
         card.classList.add('absolute')
-        card.style.top = `${5*i}vh`
+        card.style.top = `${cardGap*i}vh`
         card.style.zIndex = i
         stack.appendChild(card)
     }
@@ -83,6 +83,11 @@ function generateCardStack(cards) {
 }
 
 function splitStack(event) {
+    let heldStack = document.getElementById('heldStack')
+    if (heldStack.childElementCount > 0) {
+        console.log("already holding cards!")
+        return null
+    }
     if (event.target.id.substring(0,4) == 'card') {
         cardClicked = event.target
     } else if (event.target.parentElement.id.substring(0,4) == 'card') {
@@ -99,11 +104,24 @@ function splitStack(event) {
     );
     console.log(indexClicked)
 
-    let heldStack = document.createElement('div')
     for (let i = indexClicked; i < stackClicked.length; i++) {
         heldStack.appendChild(document.getElementById(`card-${stackClicked[i][2]}${stackClicked[i][0]}${stackClicked[i][1]}`))
     }
+    stacks[locationClicked.id.substring(9)] = stackClicked.slice(0, indexClicked)
+    orderStack()
     return heldStack
+}
+
+function moveStack(event) {
+    document.getElementById('heldStack').style.top = `${event.clientY}px`
+    document.getElementById('heldStack').style.left = `${event.clientX}px`
+    console.log(event.clientX)
+}
+
+function orderStack() {
+    for (const [index, child] of Array.from(document.getElementById('heldStack').children).entries()) {
+        child.style.top = `${cardGap*index}vh`
+    }
 }
 
 window.onload = () => {
@@ -126,4 +144,5 @@ window.onload = () => {
     //const cardlist = shuffle([['S','12'],['D','10'],['C','1'],['H','0']])
     //document.getElementById('game').appendChild(generateCardStack(cardlist))
     document.addEventListener('mousedown', splitStack)
+    document.addEventListener('mousemove', moveStack)
 };
