@@ -108,20 +108,50 @@ function splitStack(event) {
         heldStack.appendChild(document.getElementById(`card-${stackClicked[i][2]}${stackClicked[i][0]}${stackClicked[i][1]}`))
     }
     stacks[locationClicked.id.substring(9)] = stackClicked.slice(0, indexClicked)
-    orderStack()
+    orderStack(heldStack)
     return heldStack
 }
 
 function moveStack(event) {
     document.getElementById('heldStack').style.top = `${event.clientY}px`
     document.getElementById('heldStack').style.left = `${event.clientX}px`
-    console.log(event.clientX)
 }
 
-function orderStack() {
-    for (const [index, child] of Array.from(document.getElementById('heldStack').children).entries()) {
+// Correctly format the children of stackElement to ensure the cards are in the correct order with no unsightly gaps.
+function orderStack(stackElement) {
+    for (const [index, child] of Array.from(stackElement.children).entries()) {
         child.style.top = `${cardGap*index}vh`
+        child.style.zIndex = index
     }
+}
+
+function dropStack(event) {
+    dropLocation = event.target
+    if (dropLocation == null || dropLocation.id == 'game') {
+        console.log('No stack clicked')
+        return null
+    }
+    while (!dropLocation.classList.contains('stack-location')) {
+        dropLocation = dropLocation.parentElement
+        if (dropLocation.tagName == 'html') {
+            console.log('No stack clicked')
+            return null
+        }
+    }
+    stackLocationDropped = dropLocation.id.substring(9)
+    stackDroppedOnto = dropLocation.children[0] // TODO allow drop onto empty stack
+    for (const child of stackDroppedOnto.children) {
+        console.log(`${child.id}`)
+    }
+    // TODO verify legal drop
+    cardsToDrop = Array.from(document.getElementById('heldStack').children)
+    console.log(cardsToDrop)
+    for (const card of cardsToDrop) {
+        stackDroppedOnto.appendChild(card)
+    }
+    // TODO update stacks
+    orderStack(stackDroppedOnto)
+    return stackDroppedOnto
 }
 
 window.onload = () => {
@@ -141,8 +171,8 @@ window.onload = () => {
         stacks.push(cardsToDeal)
         mainGameObject.appendChild(stackLocation)
     }
-    //const cardlist = shuffle([['S','12'],['D','10'],['C','1'],['H','0']])
-    //document.getElementById('game').appendChild(generateCardStack(cardlist))
+
     document.addEventListener('mousedown', splitStack)
     document.addEventListener('mousemove', moveStack)
+    document.addEventListener('mouseup', dropStack)
 };
