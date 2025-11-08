@@ -103,7 +103,6 @@ function splitStack(event) {
     const indexClicked = stackClicked.findIndex(
         (item) => item.every((value, index) => value === cardArrayClicked[index])
     );
-    console.log(indexClicked)
 
     for (let i = indexClicked; i < stackClicked.length; i++) {
         heldStack.appendChild(document.getElementById(`card-${stackClicked[i][2]}${stackClicked[i][0]}${stackClicked[i][1]}`))
@@ -141,13 +140,9 @@ function dropStack(event) {
         }
     }
     stackLocationDropped = dropLocation.id.substring(9)
-    stackDroppedOnto = dropLocation.children[0] // TODO allow drop onto empty stack
-    for (const child of stackDroppedOnto.children) {
-        console.log(`${child.id}`)
-    }
+    stackDroppedOnto = dropLocation.children[0]
     // TODO verify legal drop
     cardsToDrop = Array.from(document.getElementById('heldStack').children)
-    console.log(cardsToDrop)
     for (const card of cardsToDrop) {
         stackDroppedOnto.appendChild(card)
     }
